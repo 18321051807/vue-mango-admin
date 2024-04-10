@@ -32,13 +32,12 @@ export const setToken = (data: DataInfo<Date>) => {
     let expires = 0;
     const { token } = data;
     expires = new Date(data.expires).getTime();
-    console.log(expires);
     Session.set(ACCESS_TOKEN, token)
 
 }
 
 /** 格式化token（jwt格式） */
-export const formatToken = (token: string): string => {
+export const formatToken = (token: any): string => {
     return "Bearer " + token;
 };
 

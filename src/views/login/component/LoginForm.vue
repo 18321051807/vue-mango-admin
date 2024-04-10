@@ -57,7 +57,7 @@ const handleLogin = async () => {
       username: data.account,
     });
     console.log(res, "userInfo");
-    if (res.status == "200") {
+    if (res.code == "200") {
       router.push("/home");
     }
   } catch (error) {

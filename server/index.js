@@ -30,8 +30,9 @@ app.post('/login', (req, res) => {
         };
         const token = generateToken(user.id, user.role);
         const expires = Date.now() + 60 * 60 * 2
+        const message = "登陆成功"
         let data = {
-            ...user, token, expires
+            ...user, token, expires, message
         }
         res.success(data);
     }

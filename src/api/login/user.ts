@@ -1,24 +1,4 @@
-import { http } from "@/utils/http/index"
-interface LoginParams {
-    username: string;
-    password: string;
-}
-
-import { ErrorMessageMode } from '#/axios';
-import axios from "axios";
-
-
-interface RoleInfo {
-    roleName: string;
-    value: string;
-}
-
-interface LoginResultModel {
-    userId: string | number;
-    token: string;
-    roles: RoleInfo[];
-}
-
+import { request } from '@/utils/http';
 export type RefreshTokenResult = {
     success: boolean;
     data: {
@@ -31,21 +11,18 @@ export type RefreshTokenResult = {
     };
 };
 
-export const loginApi = (params: LoginParams) => {
-    return http.request<RefreshTokenResult>("get", "/basic-api/interact_api/v1/pin_tab_lead", {
-        data: params
-    });
+export const getLogin = (data?: object) => {
+    return request({
+        url: '/api/login',
+        method: 'post',
+        data,
+    })
 }
-
-/** 登录 */
-// export const getLogin = (params?: object) => {
-//     return http.request("get", "/api/en", {});
-// };
 
 export const refreshTokenApi = (data?: object) => {
-    return http.request<RefreshTokenResult>("post", "/refresh-token", { data });
-}
-
-export const getLogin = (params?: object) => {
-    return http.request("post", '/api/login', { data: params })
+    return request({
+        url: '/refresh-token',
+        method: 'post',
+        data,
+    })
 }

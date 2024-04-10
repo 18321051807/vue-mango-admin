@@ -1,16 +1,31 @@
-import Axios, {
-    type AxiosInstance,
-    type AxiosRequestConfig,
-    type CustomParamsSerializer
-} from "axios";
+import axios, { CanceledError, type CustomParamsSerializer, type AxiosResponse, type AxiosRequestConfig } from 'axios';
 
-import qs from 'qs';
 import { stringify } from "qs";
 
-import { HttpRequestConfig, RequestMethods, HttpResponse } from "./types";
-import NProgress from "@/utils/progress"
+import { message as $message, Modal } from 'ant-design-vue';
+
+import { ResultEnum } from '@/enums/httpEnum';
 import { formatToken, getToken } from "../auth";
-import { useUserStoreHook } from "@/store/modules/user";
+
+
+export interface RequestOptions extends AxiosRequestConfig {
+    /** 是否直接将数据从响应中提取出，例如直接返回 res.data，而忽略 res.code 等信息 */
+    isReturnResult?: boolean;
+    /** 请求成功是提示信息 */
+    successMsg?: string;
+    /** 请求失败是提示信息 */
+    errorMsg?: string;
+    /** 成功时，是否显示后端返回的成功信息 */
+    showSuccessMsg?: boolean;
+    /** 失败时，是否显示后端返回的失败信息 */
+    showErrorMsg?: boolean;
+    requestType?: 'json' | 'form';
+}
+
+
+
+const UNKNOWN_ERROR = '未知错误，请重试';
+const UNUSUAL_ERROR = '账号异常，您可以取消停留在该页上，或重新登录'
 
 const defaultConfig: AxiosRequestConfig = {
     // 请求超时时间
@@ -26,167 +41,142 @@ const defaultConfig: AxiosRequestConfig = {
     }
 };
 
-class Request {
-    constructor() {
-        this.httpInterceptorsRequest();
-        this.httpInterceptorsResponse();
-    }
+const service = axios.create(defaultConfig);
 
-    /** token过期后，暂存待执行的请求 */
-    private static requests = [];
+service.interceptors.request.use(
+    (config) => {
 
-    /** 防止重复刷新token */
-    private static isRefreshing = false;
+        const token = getToken();
+        if (token && config.headers) {
+            // 请求头token信息
+            config.headers['Authorization'] = formatToken(token);
+        }
+        return config;
+    },
+    (error) => {
+        console.log(error)
+        Promise.reject(error);
+    },
+);
 
-    /** 初始化配置对象 */
-    private static initConfig: any = {};
 
-    /** 保存当前Axios实例对象 */
-    private static axiosInstance: AxiosInstance = Axios.create(defaultConfig);
+service.interceptors.response.use(
+    (response) => {
+        const res = response.data;
+        const code = res.code;
+        // 二进制数据则直接返回
+        if (response.request.responseType === 'blob' || response.request.responseType === 'arraybuffer') {
+            return response.data
+        }
 
-    /** 重连原始请求 */
-    private static retryOriginalRequest(config) {
-        return new Promise(resolve => {
-            Request.requests.push((token: string) => {
-                config.headers["Authorization"] = formatToken(token);
-                resolve(config);
-            });
-        });
-    }
-
-    /** 请求拦截 */
-    private httpInterceptorsRequest(): void {
-        Request.axiosInstance.interceptors.request.use(
-            async (config: HttpRequestConfig): Promise<any> => {
-
-                // 开启进度条动画
-                NProgress.start();
-                // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
-                if (typeof config.beforeRequestCallback === "function") {
-                    config.beforeRequestCallback(config);
-                    return config;
-                }
-                if (Request.initConfig.beforeRequestCallback) {
-                    Request.initConfig.beforeRequestCallback(config);
-                    return config;
-                }
-                /** 请求白名单，放置一些不需要token的接口（通过设置请求白名单，防止token过期后再请求造成的死循环问题） */
-                const whiteList = ["/refresh-token", "/login"];
-
-                return whiteList.find(url => url === config.url) ? config : new Promise(resolve => {
-                    const data = getToken();
-
-                    if (data) {
-                        const now = new Date().getTime();
-                        const expired = parseInt(data.expires) - now <= 0;
-                        if (expired) {
-                            if (!Request.isRefreshing) {
-                                Request.isRefreshing = true;
-                                // token过期刷新
-                                useUserStoreHook().handRefreshToken({ refreshToken: data.refreshToken })
-                                    .then(res => {
-                                        const token = res.data.accessToken
-                                        config.headers["Authorization"] = formatToken(token);
-                                        Request.requests.forEach(cb => cb(token));
-                                        Request.requests = [];
-                                    }).finally(() => {
-                                        Request.isRefreshing = false
-                                    })
-                            }
-                            resolve(Request.retryOriginalRequest(config));
-
-                        } else {
-                            config.headers["Authorization"] = formatToken(
-                                data.accessToken
-                            );
-                            resolve(config);
-                        }
-                    } else {
-                        resolve(config);
-                    }
-                })
-            },
-            error => {
-                return Promise.reject(error)
-            }
-
-        )
-    }
-
-    /** 响应拦截 */
-    private httpInterceptorsResponse(): void {
-        const instance = Request.axiosInstance;
-        instance.interceptors.response.use(
-            (response: HttpResponse) => {
-                const $config = response.config;
-                // 关闭进度条动画
-                NProgress.done();
-                // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
-                if (typeof $config.beforeResponseCallback === "function") {
-                    $config.beforeResponseCallback(response);
-                    return response.data;
-                }
-                if (Request.initConfig.beforeResponseCallback) {
-                    Request.initConfig.beforeResponseCallback(response);
-                    return response.data;
-                }
-                console.log(response,'response');
-
-                return response.data;
-            },
-            (error) => {
-                const $error = error;
-                $error.isCancelRequest = Axios.isCancel($error);
-                // 关闭进度条动画
-                NProgress.done();
-                // 所有的响应异常 区分来源为取消请求/非取消请求
-                return Promise.reject($error);
-            }
-        );
-    }
-
-    public post<T, P>(url: string,
-        params?: AxiosRequestConfig<T>,
-        config?: HttpRequestConfig): Promise<P> {
-        return this.request("post", url, params, config)
-    }
-    /** 单独抽离的get工具函数 */
-    public get<T, P>(
-        url: string,
-        params?: AxiosRequestConfig<T>,
-        config?: HttpRequestConfig
-    ): Promise<P> {
-        return this.request<P>("get", url, params, config);
-    }
-
-    /** 通用请求工具函数 */
-    public request<T>(
-        method: RequestMethods,
-        url: string,
-        param?: AxiosRequestConfig,
-        axiosConfig?: HttpRequestConfig
-    ): Promise<T> {
-        const config = {
-            method,
-            url,
-            ...param,
-            ...axiosConfig
-        } as HttpRequestConfig;
-        console.log(config, 'config');
-
-        // 单独处理自定义请求/响应回调
-        return new Promise((resolve, reject) => {
-            Request.axiosInstance
-                .request(config)
-                .then((response: undefined) => {
-                    resolve(response);
-                })
-                .catch(error => {
-                    reject(error);
+        // if the custom code is not 200, it is judged as an error.
+        if (code !== ResultEnum.SUCCESS) {
+            $message.error(res.message || UNKNOWN_ERROR);
+            if ([1101, 1105].includes(code)) {
+                Modal.confirm({
+                    title: '警告',
+                    content: res.message || UNUSUAL_ERROR,
+                    okText: '重新登录',
+                    cancelText: '取消',
+                    onOk: () => {
+                        localStorage.clear();
+                        window.location.reload();
+                    },
                 });
-        });
+            }
+
+            // throw other
+            const error = new Error(res.message || UNKNOWN_ERROR) as Error & { code: any };
+            error.code = code;
+            return Promise.reject(error);
+        } else {
+            return Promise.resolve(res)
+        }
+    },
+    (error) => {
+        if (!(error instanceof CanceledError)) {
+            // 处理 422 或者 500 的错误异常提示
+            const errMsg = error?.response?.data?.message ?? UNKNOWN_ERROR;
+            $message.error({ content: errMsg, key: errMsg });
+            error.message = errMsg;
+        }
+        return Promise.reject(error);
+    },
+);
+
+
+type BaseResponse<T = any> = Omit<API.ResOp, 'data'> & {
+    data: T;
+};
+
+
+
+type BaseResponseWithCode<T> = BaseResponse<T> & { code: number };
+
+export function request<T = any>(
+    url: string,
+    config: { isReturnResult: false } & RequestOptions,
+): Promise<BaseResponse<T>>;
+
+export function request<T = any>(
+    url: string,
+    config: RequestOptions,
+): Promise<BaseResponse<T>['data']>;
+
+export function request<T = any>(
+    config: { isReturnResult: false } & RequestOptions,
+): Promise<BaseResponse<T>>;
+
+export function request<T = any>(config: RequestOptions): Promise<BaseResponse<T>['data']>;
+
+
+
+/**
+ *
+ * @param url - request url
+ * @param config - AxiosRequestConfig
+ */
+export async function request(_url: string | RequestOptions, _config: RequestOptions = {}) {
+    const url = typeof _url == "string" ? _url : _url.url;
+    const config = typeof _url == "string" ? _config : _url;
+    try {
+        // 兼容 from data 文件上传的情况
+        const { requestType, isReturnResult = false, ...rest } = config;
+
+        const response = (await service.request({
+            url,
+            ...rest,
+            headers: {
+                ...rest.headers,
+                ...(requestType === 'form' ? { 'Content-Type': 'multipart/form-data' } : {}),
+            },
+        })) as AxiosResponse<BaseResponse> & { code: number };
+
+        const { code, data } = response;
+
+        const { message } = data || {};
+
+        const hasSuccess = data && code === ResultEnum.SUCCESS;
+
+        if (hasSuccess) {
+            const { successMsg, showSuccessMsg } = config;
+            if (successMsg) {
+                $message.success(successMsg);
+            } else if (showSuccessMsg && message) {
+                $message.success(message);
+            }
+        }
+
+        // 页面代码需要获取 code，data，message 等信息时，需要将 isReturnResult 设置为 false
+        if (!isReturnResult) {
+            return response;
+        } else {
+            return data;
+        }
+
+    } catch (error) {
+        return Promise.reject(error);
     }
 }
 
-
-export const http = new Request();
+export default service

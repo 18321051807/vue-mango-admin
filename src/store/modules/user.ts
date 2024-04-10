@@ -61,7 +61,7 @@ export const useUserStore = defineStore({
             const { ...loginParams } = params;
             try {
                 let res: any = await getLogin(loginParams)
-                if (res.status == '200') {
+                if (res.code == '200') {
                     // save token
                     setToken(res.data);
                     return res
