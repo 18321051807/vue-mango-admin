@@ -1,6 +1,6 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readdir, stat } from "node:fs";
+import { readdir} from "node:fs";
 
 
 /** 启动`node`进程时所在工作目录的绝对路径 */
@@ -41,7 +41,7 @@ const getPackageSize = options => {
     const { folder = "dist", callback, format = true } = options;
     readdir(folder, (err, files: string[]) => {
         if (err) throw err;
-        let count = 0;
+        // let count = 0;
         // const checkEnd = () => {
         //     ++count == files.length &&
         //         callback(format ? formatBytes(sum(fileListTotal)) : sum(fileListTotal));

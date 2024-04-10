@@ -1,14 +1,14 @@
 /*
  * @Author: kkle
  * @Date: 2022-08-30 16:31:52
- * @LastEditTime: 2024-03-20 14:38:12
+ * @LastEditTime: 2024-04-10 14:49:51
  * @LastEditors: kkle
  * @Description:
  * @FilePath: /vue-mango-admin/vite.config.ts
  */
 import { resolve } from "path";
 import { ConfigEnv, loadEnv, UserConfig, defineConfig } from "vite";
-import { root, alias } from "./build/utils"
+import { alias } from "./build/utils"
 import { getPluginsList } from './build/plugins'
 import { generateModifyVars } from "./build/modifyVars"
 export default ({ mode }: ConfigEnv): UserConfig => {

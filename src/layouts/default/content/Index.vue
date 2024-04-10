@@ -8,6 +8,10 @@ const openCache = ref(true);
 const getCaches = computed((): string[] => {
   return [];
 });
+const content = ref(null);
+const targetFn = () => {
+  return content.value ? content.value : window;
+};
 </script>
 
 <template>
@@ -22,11 +26,7 @@ const getCaches = computed((): string[] => {
         </transition>
       </template>
     </RouterView>
-    <BackTop
-      v-if="isOpenBackTop"
-      :target="() => content"
-      :visibilityHeight="100"
-    />
+    <BackTop v-if="isOpenBackTop" :target="targetFn" :visibilityHeight="100" />
   </div>
 </template>
 

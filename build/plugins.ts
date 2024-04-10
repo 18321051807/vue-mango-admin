@@ -5,7 +5,7 @@ import vueJsx from "@vitejs/plugin-vue-jsx";
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import { vitePluginFakeServer } from "vite-plugin-fake-server";
+// import { vitePluginFakeServer } from "vite-plugin-fake-server";
 import svgLoader from "vite-svg-loader";
 import removeConsole from "vite-plugin-remove-console";
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
@@ -14,7 +14,7 @@ import path from "path";
 import UnoCSS from 'unocss/vite'
 
 export function getPluginsList(): PluginOption[] {
-    const lifecycle = process.env.npm_lifecycle_event;
+    // const lifecycle = process.env.npm_lifecycle_event;
     return [
         vue(),
         // * vite 可以使用 jsx/tsx 语法

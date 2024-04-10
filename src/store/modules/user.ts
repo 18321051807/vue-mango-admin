@@ -69,10 +69,10 @@ export const useUserStore = defineStore({
             } catch (error) {
                 return Promise.reject(error);
             }
+            return null
         },
         /** 刷新`token` */
         async handRefreshToken(data) {
-            console.log(data, '这有东西吗');
 
             return new Promise<RefreshTokenResult>((resolve, reject) => {
                 refreshTokenApi(data).then(data => {

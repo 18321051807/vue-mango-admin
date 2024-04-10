@@ -4,8 +4,8 @@ defineOptions({
 });
 
 import { Layout } from "ant-design-vue";
-import MultioleHeader from "./multipleHeader/Index";
-import LayoutContent from "./content/Index";
+import MultioleHeader from "./multipleHeader/Index.vue";
+import LayoutContent from "./content/Index.vue";
 const isHideHeader = ref(false);
 </script>
 
