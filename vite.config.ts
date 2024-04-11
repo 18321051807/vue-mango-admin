@@ -1,7 +1,7 @@
 /*
  * @Author: kkle
  * @Date: 2022-08-30 16:31:52
- * @LastEditTime: 2024-04-10 15:44:01
+ * @LastEditTime: 2024-04-11 10:19:41
  * @LastEditors: kkle
  * @Description:
  * @FilePath: /vue-mango-admin/vite.config.ts
@@ -36,25 +36,17 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       cors: true,
       proxy: {
         "/api": {
-          target: env.VITE_APP_BASE_URL,
+          target: "http://localhost:8099",
           changeOrigin: true,
           secure: false,
           // eslint-disable-next-line no-shadow
           rewrite: (p) => p.replace(/^\/api/, ""),
         },
         '/basic-api': {
-          target: env.VITE_APP_BASIC_API,
+          target:"https://api.vvhan.com/",
           changeOrigin: true,
           ws: true,
           rewrite: (path) => path.replace(new RegExp(`^/basic-api`), ''),
-          // only https
-          secure: false
-        },
-        '/local-api': {
-          target: env.VITE_APP_LOCAL_URL,
-          changeOrigin: true,
-          ws: true,
-          rewrite: (path) => path.replace(new RegExp(`^/local-api`), ''),
           // only https
           secure: false
         },

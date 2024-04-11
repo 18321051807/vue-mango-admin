@@ -13,7 +13,7 @@ export type RefreshTokenResult = {
 
 export const getLogin = (data?: object) => {
     return request({
-        url: '/api/login',
+        url: '/login',
         method: 'post',
         data,
     })

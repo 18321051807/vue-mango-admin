@@ -10,11 +10,11 @@ import QRCodeLogin from "./component/QRCodeLogin.vue";
 import RegisterInfo from "./component/RegisterInfo.vue";
 const svgAsUrl = new URL("@/assets/login/login-bg.svg", import.meta.url).href;
 
-import { getDailyEnglish } from "@/api/basic/index";
+// import { getDailyEnglish } from "@/api/basic/index";
 
 const getDaily = async () => {
-  let res = await getDailyEnglish();
-  console.log(res, "res");
+  // let res = await getDailyEnglish();
+  // console.log(res, "res");
 };
 onMounted(async () => {
   await getDaily();

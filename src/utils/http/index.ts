@@ -26,8 +26,11 @@ export interface RequestOptions extends AxiosRequestConfig {
 
 const UNKNOWN_ERROR = '未知错误，请重试';
 const UNUSUAL_ERROR = '账号异常，您可以取消停留在该页上，或重新登录'
+/** 真实请求的路径前缀 */
+export const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
 const defaultConfig: AxiosRequestConfig = {
+    baseURL,
     // 请求超时时间
     timeout: 10000,
     headers: {
@@ -64,11 +67,9 @@ service.interceptors.response.use(
     (response) => {
         const res = response.data;
         const code = res.code;
-        // 二进制数据则直接返回
         if (response.request.responseType === 'blob' || response.request.responseType === 'arraybuffer') {
             return response.data
         }
-
         // if the custom code is not 200, it is judged as an error.
         if (code !== ResultEnum.SUCCESS) {
             $message.error(res.message || UNKNOWN_ERROR);
@@ -128,8 +129,6 @@ export function request<T = any>(
 ): Promise<BaseResponse<T>>;
 
 export function request<T = any>(config: RequestOptions): Promise<BaseResponse<T>['data']>;
-
-
 
 /**
  *
