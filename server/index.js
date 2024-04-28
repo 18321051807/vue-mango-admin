@@ -18,6 +18,8 @@ const generateToken = require("./modules/generateToken")
 
 const refreshTokenRouter = require("./modules/refreshTokenRouter")
 
+const mysql = require("mysql")
+
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -41,12 +43,12 @@ app.post('/login', (req, res) => {
 app.get('/table/data', (req, res) => {
     // Handle the GET request
     const data = {
-      message: 'Hello, world!',
-      timestamp: new Date().toISOString()
+        message: 'Hello, world!',
+        timestamp: new Date().toISOString()
     };
-    
+
     res.json(data);
-  });
+});
 
 // 错误处理中间件
 app.use((err, req, res, next) => {

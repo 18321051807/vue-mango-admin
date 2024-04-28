@@ -1,13 +1,3 @@
-<!--
- * @Author: 可可乐
- * @Date: 2023-03-28 10:04:06
- * @LastEditors: kkle
- * @LastEditTime: 2024-03-11 13:26:15
- * @FilePath: /vue-mango-admin/src/views/error/404.vue
- * @Description: 
- * 
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
--->
 <template>
   <div class="error layout-padding">
     <div class="layout-padding-auto layout-padding-view">

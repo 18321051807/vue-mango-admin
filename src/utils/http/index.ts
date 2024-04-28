@@ -1,12 +1,10 @@
 import axios, { CanceledError, type CustomParamsSerializer, type AxiosResponse, type AxiosRequestConfig } from 'axios';
 
 import { stringify } from "qs";
-
 import { message as $message, Modal } from 'ant-design-vue';
 
 import { ResultEnum } from '@/enums/httpEnum';
 import { formatToken, getToken } from "../auth";
-
 
 export interface RequestOptions extends AxiosRequestConfig {
     /** 是否直接将数据从响应中提取出，例如直接返回 res.data，而忽略 res.code 等信息 */

@@ -1,10 +1,3 @@
-<!--
- * @Author: kkle
- * @Date: 2024-03-14 11:02:16
- * @LastEditors: kkle
- * @LastEditTime: 2024-03-15 14:43:33
- * @Description: 注册信息
--->
 
 <script setup lang="ts">
 defineOptions({

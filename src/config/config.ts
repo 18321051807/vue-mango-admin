@@ -1,13 +1,3 @@
-/*
- * @Author: 可可乐
- * @Date: 2023-04-20 14:02:30
- * @LastEditors: kkle
- * @LastEditTime: 2024-03-12 11:13:30
- * @FilePath: /vue-mango-admin/src/config/config.ts
- * @Description: 
- * 
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
- */
 // ? 全局不动配置项 只做导出不做修改
 
 // * token

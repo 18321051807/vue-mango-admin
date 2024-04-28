@@ -1,11 +1,3 @@
-/*
- * @Author: kkle
- * @Date: 2022-11-11 17:21:41
- * @LastEditTime: 2024-03-12 10:18:32
- * @LastEditors: kkle
- * @Description:
- * @FilePath: /vue-mango-admin/src/utils/storage.ts
- */
 /**
  * 封装操作localstorage本地存储的方法
  * @auther kkle

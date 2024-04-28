@@ -1,10 +1,3 @@
-<!--
- * @Author: kkle
- * @Date: 2024-03-15 10:15:18
- * @LastEditors: kkle
- * @LastEditTime: 2024-03-15 15:47:40
- * @Description: 密码强度
--->
 
 <script setup lang="ts">
 defineOptions({
