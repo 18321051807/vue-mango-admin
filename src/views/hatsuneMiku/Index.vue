@@ -5,7 +5,7 @@ defineOptions({
 </script>
 
 <template>
-  <div></div>
+  <div>effect</div>
 </template>
 
 <style lang="less" scoped></style>

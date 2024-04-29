@@ -28,14 +28,14 @@ import { setupStore } from '@/store';
 const app = createApp(App);
 app.config.errorHandler = errorHandler;
 
-// router-guard
-app.use(router);
 
 // 配置 store
 setupStore(app)
 // antd
 app.use(Antd)
 
+// router-guard
+app.use(router);
 
 // 等路由ready以后再进行挂载组件
 router.isReady().then(() => app.mount("#app"));
