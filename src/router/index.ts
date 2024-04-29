@@ -17,6 +17,8 @@ console.log(import.meta.env, '----');
 
 let routes: RouteRecordRaw[] = []
 routes.push(...basicRoutes, ...modules)
+console.log(routes, 'routes');
+
 
 // app router
 const router = createRouter({

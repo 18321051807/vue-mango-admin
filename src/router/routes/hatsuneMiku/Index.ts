@@ -5,22 +5,21 @@ import { LAYOUT } from '@/router/constant';
 
 
 const charts: AppRouteModule = {
-    path: '/',
-    name: 'Home',
-    redirect: '/home',
+    path: '/mango',
+    name: 'Mango',
+    redirect: '/mango/effect',
     component: LAYOUT,
     meta: {
         title: "zhuye"
     },
     children: [
         {
-            path: '/home',
-            name: 'Home',
+            path: 'effect',
+            name: 'Effect',
             meta: {
                 title: "主页"
             },
-            component: () => import("@/views/home/Index.vue")
-
+            component: () => import("@/views/hatsuneMiku/Index.vue")
         }
     ]
 }
